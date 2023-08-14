@@ -9,7 +9,6 @@ public class SpokeScript : MonoBehaviour
     private bool _isActive = true;
     private Rigidbody2D _rb;
     private BoxCollider2D _spokeCollider;
-    private int _score;
 
     private void Awake()
     {
@@ -32,9 +31,7 @@ public class SpokeScript : MonoBehaviour
         if (collision.tag == "Knob")
         {
             collision.gameObject.GetComponent<CircleCollider2D>().enabled = false;
-            _score++;
-            GameController.Instance.GameUI.UpdateScore(_score);
-            Debug.Log(_score);
+            GameController.Instance.GameUI.UpdateScore();
             collision.gameObject.GetComponent<Animator>().SetTrigger("ScoreChange");
             /*collision.gameObject.SetActive(false);*/
         }

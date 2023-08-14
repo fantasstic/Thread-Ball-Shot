@@ -15,15 +15,24 @@ public class GameUI : MonoBehaviour
     [SerializeField] private GameObject _spokeIcon;
     [SerializeField] private Sprite _usedSpokeIconSprite;
 
+    private int _score;
+
     public void ShoGameOverScreen()
     {
         _gameOverScreen.SetActive(true);
+    }
+
+    public void UpdateScore()
+    {
+        _score++;
+        UpdateScore(_score);
     }
 
     public void UpdateScore(int score)
     {
         _scoreAnimator.SetTrigger("ScoreChange");
         _scoreCounter.text = score.ToString();
+        _score = score;
     }
 
     public void SetInitialDisplayedSpokeCount(int count)
