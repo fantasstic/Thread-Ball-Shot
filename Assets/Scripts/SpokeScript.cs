@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class SpokeScript : MonoBehaviour
 {
@@ -9,16 +11,28 @@ public class SpokeScript : MonoBehaviour
     private bool _isActive = true;
     private Rigidbody2D _rb;
     private BoxCollider2D _spokeCollider;
+    private GameUI _gameUI;
+    private Button _pauseButton;
 
     private void Awake()
     {
         _rb = GetComponent<Rigidbody2D>();
         _spokeCollider = GetComponent<BoxCollider2D>();
+        _pauseButton = GameObject.Find("PauseButton").GetComponent<Button>();
+        _gameUI = GameController.Instance.GameUI;
+    }
+
+    private bool IsPointerOverUIObject()
+    {
+        return EventSystem.current.IsPointerOverGameObject() || (Input.touchCount > 0 && EventSystem.current.IsPointerOverGameObject(Input.GetTouch(0).fingerId));
     }
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0) && _isActive)
+        if (Input.GetMouseButtonDown(0))
+            Debug.Log(IsPointerOverUIObject());
+
+        if (!_gameUI.IsPaused && Input.GetMouseButtonDown(0) && _isActive && !IsPointerOverUIObject())
         {
             _rb.AddForce(_throwForce, ForceMode2D.Impulse);
             _rb.gravityScale = 1;
@@ -28,12 +42,14 @@ public class SpokeScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
+        if (_gameUI.IsPaused)
+            return;
+
         if (collision.tag == "Knob")
         {
             collision.gameObject.GetComponent<CircleCollider2D>().enabled = false;
             GameController.Instance.GameUI.UpdateScore();
             collision.gameObject.GetComponent<Animator>().SetTrigger("ScoreChange");
-            /*collision.gameObject.SetActive(false);*/
         }
     }
 

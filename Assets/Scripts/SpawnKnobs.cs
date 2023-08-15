@@ -9,7 +9,7 @@ public class SpawnKnobs : MonoBehaviour
     [SerializeField] private int _minKnobs = 2;
     [SerializeField] private int _maxKnobs = 4;  
     
-    private List<Vector3> _spawnPositions = new List<Vector3>(); 
+    private List<Vector3> _spawnPositions = new List<Vector3>();
 
     private void Start()
     {
@@ -30,6 +30,19 @@ public class SpawnKnobs : MonoBehaviour
             Vector3 spawnPosition = _spawnPositions[Random.Range(0, _spawnPositions.Count)];
             GameObject spawnedObject = Instantiate(_knobPrefab, _ball);
             spawnedObject.transform.position = spawnPosition;
+        }
+    }
+
+    public void DeleteKnobs(bool delete)
+    {
+        GameObject[] spawnedObjects = GameObject.FindGameObjectsWithTag("Knob");
+
+        if (delete)
+        {
+            foreach (var obj in spawnedObjects)
+            {
+                Destroy(obj);
+            }
         }
     }
 }

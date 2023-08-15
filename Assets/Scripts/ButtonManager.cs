@@ -10,6 +10,7 @@ public class ButtonManager : MonoBehaviour
     [SerializeField] private GameObject _settingsPanel, _mainMenuPanel, _pausePanel, _gameOverScreen;
     [SerializeField] private Button _musicButton, _soundButton;
     [SerializeField] private Sprite _musicOnSprite, _musicOffSprite, _soundOnSprite, _soundOffSprite;
+    [SerializeField] private AudioSource _musicAudio, _soundsAudio; 
 
     private void Start()
     {
@@ -21,10 +22,28 @@ public class ButtonManager : MonoBehaviour
         if (PlayerPrefs.GetString("Music") == "Yes")
         {
             _musicButton.image.sprite = _musicOnSprite;
+            _musicAudio.mute = false;
         }
         else
         {
             _musicButton.image.sprite = _musicOffSprite;
+            _musicAudio.mute = true;
+        }
+
+        if (!PlayerPrefs.HasKey("Sounds"))
+        {
+            PlayerPrefs.SetString("Sounds", "Yes");
+        }
+
+        if (PlayerPrefs.GetString("Sounds") == "Yes")
+        {
+            _soundButton.image.sprite = _soundOnSprite;
+            _soundsAudio.mute = false;
+        }
+        else
+        {
+            _soundButton.image.sprite = _soundOffSprite;
+            _soundsAudio.mute = true;
         }
     }
 
@@ -35,7 +54,8 @@ public class ButtonManager : MonoBehaviour
 
     public void OpenSettings(bool inGame)
     {
-        if(!inGame)
+        PlayButtonSound();
+        if (!inGame)
         {
             _mainMenuPanel.SetActive(false);
             _settingsPanel.SetActive(true);
@@ -49,6 +69,7 @@ public class ButtonManager : MonoBehaviour
 
     public void CloseSettings(bool inGame) 
     {
+        PlayButtonSound();
         if (!inGame)
         {
             _mainMenuPanel.SetActive(true);
@@ -63,32 +84,61 @@ public class ButtonManager : MonoBehaviour
 
     public void MusicSwitch()
     {
-        if(PlayerPrefs.GetString("Music") == "Yes")
+        PlayButtonSound();
+        if (PlayerPrefs.GetString("Music") == "Yes")
         {
             _musicButton.image.sprite = _musicOffSprite;
+            _musicAudio.mute = true;
             PlayerPrefs.SetString("Music", "No");
         }
         else
         {
             _musicButton.image.sprite = _musicOnSprite;
+            _musicAudio.mute = false;
             PlayerPrefs.SetString("Music", "Yes");
+        }
+    }
+
+    public void SoundSwitch()
+    {
+        PlayButtonSound();
+        if (PlayerPrefs.GetString("Sounds") == "Yes")
+        {
+            _soundButton.image.sprite = _soundOffSprite;
+            _soundsAudio.mute = true;
+            PlayerPrefs.SetString("Sounds", "No");
+        }
+        else
+        {
+            _soundButton.image.sprite = _soundOnSprite;
+            _soundsAudio.mute = false;
+            PlayerPrefs.SetString("Sounds", "Yes");
         }
     }
 
     public void GameOverButtons(string sceneToLoad)
     {
+        PlayButtonSound();
         SceneManager.LoadScene(sceneToLoad);
     }
 
     public void PauseButtons()
     {
-        if(_pausePanel.active == true)
+        PlayButtonSound();
+        if (_pausePanel.active == true)
         {
             _pausePanel.SetActive(false);
+            GameController.Instance.GameUI.ShowPauseScreen();
         }
         else
         {
             _pausePanel.SetActive(true);
+            GameController.Instance.GameUI.ShowPauseScreen();
         }
+    }
+
+    private void PlayButtonSound()
+    {
+        _soundsAudio.Play();
     }
 }

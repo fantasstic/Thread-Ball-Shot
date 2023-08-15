@@ -6,9 +6,12 @@ using UnityEngine.UI;
 
 public class GameUI : MonoBehaviour
 {
-    [SerializeField] private GameObject _gameOverScreen;
+    [SerializeField] private GameObject _gameOverScreen, _ball, _scoreContainer;
+    [SerializeField] private Button _pauseButton;
     [SerializeField] private TMP_Text _scoreCounter;
     [SerializeField] private Animator _scoreAnimator;
+    [SerializeField] private Sprite _pauseImage, _pauseCloseImage;
+    [SerializeField] private ScoreCounter _gameOverScoreCounter;
 
     [Header("Spoke Count Display")]
     [SerializeField] private GameObject _spokeBar;
@@ -16,10 +19,41 @@ public class GameUI : MonoBehaviour
     [SerializeField] private Sprite _usedSpokeIconSprite;
 
     private int _score;
+    private bool _isPaused;
 
     public void ShoGameOverScreen()
     {
+        PlayerPrefs.SetInt("Score", _score);
+        _ball.SetActive(false);
+        _pauseButton.gameObject.SetActive(false);
+        _scoreContainer.SetActive(false);
+        _spokeBar.SetActive(false);
+        _gameOverScoreCounter.UpdateScore();
         _gameOverScreen.SetActive(true);
+    }
+
+    public void ShowPauseScreen()
+    {
+        if(!_isPaused)
+        {
+            _ball.SetActive(false);
+            _scoreContainer.SetActive(false);
+            _spokeBar.SetActive(false);
+            _pauseButton.image.sprite = _pauseCloseImage;
+            GameController.Instance.ToggleLastSpawnedSpoke(false);
+            _isPaused = true;
+        }
+        else
+        {
+            _ball.SetActive(true);
+
+            _ball.SetActive(true);
+            _scoreContainer.SetActive(true);
+            _spokeBar.SetActive(true);
+            _pauseButton.image.sprite = _pauseImage;
+            GameController.Instance.ToggleLastSpawnedSpoke(true);
+            _isPaused = false;
+        }
     }
 
     public void UpdateScore()
@@ -43,11 +77,17 @@ public class GameUI : MonoBehaviour
         }
     }
 
+    public void SetSpokeIconIndex(int newIndex)
+    {
+        _spokeIconIndexToChange = newIndex;
+    }
+
     private int _spokeIconIndexToChange = 7;
 
     public void DecrementDisplayedSpokeCount()
     {
-        _spokeBar.transform.GetChild(_spokeIconIndexToChange--).GetComponent<Image>().sprite = _usedSpokeIconSprite;
+        if (_spokeIconIndexToChange >= 0)
+            _spokeBar.transform.GetChild(_spokeIconIndexToChange--).GetComponent<Image>().sprite = _usedSpokeIconSprite;
     }
 
     public void ClearBar()
@@ -57,5 +97,10 @@ public class GameUI : MonoBehaviour
         {
             Destroy(_spokeBar.transform.GetChild(i).gameObject);
         }
+    }
+
+    public bool IsPaused
+    {
+        get { return _isPaused; }
     }
 }
